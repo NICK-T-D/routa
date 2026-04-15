@@ -38,6 +38,45 @@ The main things to think about are:
 - whether the backend/runtime surface is reachable from the web UI
 - whether Docker-backed execution paths are available when required
 
+## Recommended Source Checkout For Local Customizations
+
+If your self-hosted deployment needs a few local-only patches, do not carry them in the same
+working copy you use for upstream pulls.
+
+Use the local overlay pattern:
+
+- keep one clean worktree pinned to upstream
+- keep one long-lived overlay branch for your local-only behavior
+- run the browser/runtime surface from the overlay worktree
+
+The repository includes helper commands for this:
+
+```bash
+npm run overlay:bootstrap -- \
+  --clean-dir ../routa-upstream \
+  --overlay-dir ../routa-overlay \
+  --overlay-branch local/routa-overlay-team
+```
+
+After bootstrap, start the self-hosted web runtime from the overlay worktree:
+
+```bash
+cd ../routa-overlay
+npm install --legacy-peer-deps
+npm run dev
+```
+
+When upstream ships updates, sync with:
+
+```bash
+npm run overlay:sync -- \
+  --clean-dir ../routa-upstream \
+  --overlay-dir ../routa-overlay
+```
+
+For the underlying branch model and the manual fallback flow, see
+[Local Overlay And Upstream Sync](/developer-guide/local-overlay-sync).
+
 ## What This Is Not Yet
 
 The repository currently has stronger release and contributor docs than full public production

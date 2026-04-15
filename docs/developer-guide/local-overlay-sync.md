@@ -67,6 +67,41 @@ Use the overlay worktree for:
 
 Temporary PR branches can live in short-lived worktrees and should be removed after use.
 
+## Fast Path With The Helper Script
+
+If you want to turn this model into a repeatable operator flow instead of hand-running every git
+step, use the helper script that now lives in the repository:
+
+```bash
+npm run overlay:bootstrap -- \
+  --clean-dir ../routa-upstream \
+  --overlay-dir ../routa-overlay \
+  --overlay-branch local/routa-overlay-team
+```
+
+What it does:
+
+- fetches the tracked base branch
+- creates a detached clean worktree for upstream comparison
+- creates or reuses a long-lived overlay branch in a separate worktree
+
+Remote behavior:
+
+- the script prefers an `upstream` remote
+- if `upstream` does not exist, it falls back to `origin`
+- that fallback makes the script safe for existing clones that still track the original project as
+  `origin`
+
+If you maintain a fork, the recommended remote layout is:
+
+```bash
+git remote rename origin upstream
+git remote add origin <your-fork-url>
+```
+
+That keeps `upstream` read-only and leaves `origin` available for pushing backup branches or PR
+work.
+
 ## How To Capture Local Changes
 
 When you discover local changes that must survive future updates:
@@ -112,6 +147,22 @@ After the rebase:
 
 If upstream already contains the same fix, do not keep a duplicate local patch just because it was
 created earlier.
+
+The helper script wraps the same flow for the two persistent worktrees:
+
+```bash
+npm run overlay:sync -- \
+  --clean-dir ../routa-upstream \
+  --overlay-dir ../routa-overlay
+```
+
+It will:
+
+- fetch the latest base branch from `upstream` or `origin`
+- hard-refresh the clean upstream worktree to that exact ref
+- rebase the overlay worktree onto the refreshed base
+
+Before it runs, it requires both worktrees to be clean so the periodic sync stays predictable.
 
 ## How To Prepare An Upstream PR
 

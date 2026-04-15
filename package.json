@@ -105,6 +105,8 @@
     "test:e2e:rust:headed": "PLAYWRIGHT_BASE_URL=http://localhost:3210 playwright test --project=chromium-headed",
     "test:e2e:tauri": "playwright test --config=playwright.tauri.config.ts e2e/tauri-backend-check.spec.ts",
     "test:e2e:tauri:headed": "playwright test --config=playwright.tauri.config.ts e2e/tauri-backend-check.spec.ts --project=chromium-headed",
+    "overlay:bootstrap": "node --import tsx scripts/local-overlay-worktree.ts bootstrap",
+    "overlay:sync": "node --import tsx scripts/local-overlay-worktree.ts sync",
     "test:accessibility": "node scripts/fitness/check-accessibility-smoke.mjs",
     "test:otel:trace": "node --import tsx scripts/fitness/check-otel-trace-smoke.ts",
     "test:performance": "node scripts/fitness/check-performance-smoke.mjs",
